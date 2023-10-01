@@ -15,34 +15,49 @@ import {
 } from 'react-native-responsive-screen'
 import ExpoStatusBar from 'expo-status-bar/build/ExpoStatusBar'
 import { auth } from '../../../FirebaseConfig'
-import { createUserWithEmailAndPassword, AuthErrorCodes } from 'firebase/auth'
+import { AuthErrorCodes, sendEmailVerification, signInWithEmailAndPassword } from 'firebase/auth'
 import MessageModal from '../../../components/register/MessageModal'
-export default function RegisterScreen({ navigation }) {
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
-  const handleRegistration = async () => {
+  const handleSignIn = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password)
-      navigation.navigate('Login')
-      console.log(email)
+        signInWithEmailAndPassword(auth, email, password).then((result)=>{
+          const currentUser =  result.user
+          if(!currentUser.emailVerified)
+          {
+            sendEmailVerification(currentUser)
+            navigation.navigate('VerifyAccount')
+
+          }else {
+            navigation.navigate("HomeScreen")
+          }
+          
+        }).catch((error)=>{
+          setErrorMessage(error.message)
+        })
+      
+      
     } catch (error) {
       switch (error.code) {
-        case AuthErrorCodes.EMAIL_EXISTS:
-          setErrorMessage(
-            'Email already exists. Please use a different email address.',
-          )
-          break
-        case AuthErrorCodes.INVALID_EMAIL:
+        case 'auth/invalid-email':
           setErrorMessage(
             'Invalid email address. Please check your email format.',
           )
           break
+        case 'auth/user-not-found':
+          setErrorMessage('User not found. Please sign up first.')
+          break
+        case 'auth/wrong-password':
+          setErrorMessage('Incorrect password. Please try again.')
+          break
         default:
           setErrorMessage(
-            'An error occurred during registration. Please try again later.',
+            'An error occurred during sign-in. Please try again later.',
           )
+          break
       }
     }
   }
@@ -50,13 +65,13 @@ export default function RegisterScreen({ navigation }) {
   return (
     <View style={styles.container} className="bg-white h-full ">
       <TouchableOpacity
-        style={styles.arrowButton}
         onPress={() => navigation.goBack()}
+        style={styles.arrowButton}
       >
         <ReturnArrow height={hp(3.5)} width={hp(3.5)} />
       </TouchableOpacity>
       <View style={styles.LoginContainer}>
-        <Text style={styles.Text1}>Let’s start create!</Text>
+        <Text style={styles.Text1}>Welcome Back!</Text>
         <Text
           style={styles.Text2}
           className="text-[#6e6d6d] drop-shadow-lg shadow-lg"
@@ -85,22 +100,17 @@ export default function RegisterScreen({ navigation }) {
               placeholder="Must Contain at least 6 character"
             />
           </View>
-          <Text className="text-neutral-400 " style={styles.Text3}>
-            By tapping{' '}
-            <Text className="text-neutral-900">Register & Accept </Text> that
-            you have read our{' '}
-            <Text className="text-blue-500 mx-2 ">Privacy Policy</Text> and
-            agree our{' '}
-            <Text className="text-blue-500">Terms and Conditions.</Text>
+          <Text className="text-blue-400 " style={styles.Text3}>
+            Forget Password?
           </Text>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => handleRegistration()}
-            className="   rounded-lg flex items-center mb-[8px]  justify-center bg-neutral-700 text-white"
+            onPress={() => handleSignIn()}
+            className="   rounded-lg flex items-center mb-[8px]  justify-center bg-neutral-900 text-white"
           >
             <Text className="text-white" style={styles.ButtonText}>
-              Register & Accept
+              Login
             </Text>
           </TouchableOpacity>
           {errorMessage && (

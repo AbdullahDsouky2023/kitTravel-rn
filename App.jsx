@@ -5,6 +5,7 @@ import AuthIndex from "./screens/Auth/Index";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./screens/Auth/Login/LoginScreen";
+import VerifyAccount from "./screens/Auth/Login/VerifyAccount";
 import RegisterScreen from "./screens/Auth/Register/RegisterScreen";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -50,6 +51,11 @@ export default function App() {
         <Stack.Screen
           name="Register"
           component={RegisterScreen}
+          options={{ headerShown: false }}
+          />
+        <Stack.Screen
+          name="VerifyAccount"
+          component={VerifyAccount}
           options={{ headerShown: false }}
           />
       </Stack.Navigator>
