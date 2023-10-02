@@ -5,9 +5,11 @@ import AuthIndex from "./screens/Auth/Index";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./screens/Auth/Login/LoginScreen";
-import VerifyAccount from "./screens/Auth/Login/VerifyAccount";
 import RegisterScreen from "./screens/Auth/Register/RegisterScreen";
+import VerifyAccount from "./screens/Auth/Login/VerifyAccount";
+import ForgetPasswordScreen from "./screens/Auth/Login/ForgetPasswordScreen";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { auth } from "./FirebaseConfig";
 
 
 
@@ -34,15 +36,15 @@ export default function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="AuthIndex"
-          component={AuthIndex}
-          options={{ headerShown: false }}
-        />
+        name="HomeScreen"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
         <Stack.Screen
-          name="HomeScreen"
-          component={HomeScreen}
-          options={{ headerShown: false }}
-        />
+        name="AuthIndex"
+        component={AuthIndex}
+        options={{ headerShown: false }}
+      />
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -58,6 +60,12 @@ export default function App() {
           component={VerifyAccount}
           options={{ headerShown: false }}
           />
+        <Stack.Screen
+          name="ForgetPassword"
+          component={ForgetPasswordScreen}
+          options={{ headerShown: false }}
+          />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

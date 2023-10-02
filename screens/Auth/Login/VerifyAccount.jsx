@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { applyActionCode } from 'firebase/auth'
+import { applyActionCode, sendEmailVerification } from 'firebase/auth'
 import React, { useEffect, useState } from 'react'
 import {
   SafeAreaView,
@@ -8,6 +8,7 @@ import {
   Dimensions,
   TouchableOpacity,
   TextInput,
+  View,
 } from 'react-native'
 import {
   CodeField,
@@ -22,22 +23,25 @@ import {
 import { auth } from '../../../FirebaseConfig'
 import MessageModal from '../../../components/register/MessageModal'
 
-const CELL_COUNT = 5
-const { width, height } = Dimensions.get('window')
-
 const VerifyAccount = ({ navigation, route }) => {
-  const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
+  const CELL_COUNT = 5
+  const [value, setValue] = useState('')
+  const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT })
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
     value,
     setValue,
-  });
-  const [value, setValue] = useState('')
+  })
   const [errorMessage, setErrorMessage] = useState('')
+    const [user, setUser] = useState(auth.currentUser);
+
   const handleVerify = async () => {
     try {
-      await applyActionCode(auth,value);
+      await applyActionCode(auth, value)
       // Code is verified, you can now mark the user as verified
-      navigation.navigate('HomeScreen');
+      setErrorMessage(
+        'Verification Email was sent',
+      )
+      navigation.navigate('HomeScreen')
       console.log('correct') // Navigate to the home screen or any other screen
     } catch (error) {
       switch (error.code) {
@@ -46,37 +50,39 @@ const VerifyAccount = ({ navigation, route }) => {
             'Invalid email address. Please check your email format.',
           )
           break
-          default:
-            setErrorMessage('Incorrect Code. Please try again.')
-          }
+        default:
+          setErrorMessage('Incorrect Code. Please try again.')
+      }
     }
-  };
-  const handleResendEmailVefication=async()=>{
-    const user =auth().currentUser;
-    console.log('resend',user)
-    // try {
-    //   await sendEmailVerification(user);
-   
-    // } catch (error) {
-    //  setErrorMessage(error.message)
-    // }
-  };
-  
-  
+  }
+  const handleResendEmailVefication = async () => {
+    try {
+      await sendEmailVerification(user)
+      setErrorMessage('Check your email for the code')
+    } catch (error) {
+      setErrorMessage(error.message)
+    }
+  }
+
+
+
   return (
     <SafeAreaView
       style={{
         height: hp(110),
       }}
-      className="p-4 pt-16 bg-white flex gap-4"
+      className="p-4 pt-16 bg-white flex gap-32"
     >
+      <View>
+
       <Text style={styles.Text1} className=" ">
         Verify is that you?
       </Text>
       <Text style={styles.Text2} className=" text-slate-400">
         One more step, please check your verification code on your email address
       </Text>
-      <CodeField
+      </View>
+      {/* <CodeField
         ref={ref}
         {...props}
         value={value}
@@ -97,32 +103,29 @@ const VerifyAccount = ({ navigation, route }) => {
             {symbol || (isFocused ? <Cursor /> : null)}
           </Text>
         )}
-      />
-      <Text className="text-md relative mt-4 text-slate-900">
+      /> */}
+      {/* <Text className="text-md relative mt-4 text-slate-900">
         Don’t Receive the verification code?
-        <TouchableOpacity 
-        onPress={handleResendEmailVefication}>
-          <Text
-          className="text-blue-400">Resend Code
-          </Text>
+        <TouchableOpacity onPress={handleResendEmailVefication}>
+          <Text className="text-blue-400">Resend Code</Text>
         </TouchableOpacity>
-      </Text>
+      </Text> */}
       <TouchableOpacity
         style={styles.button}
-        onPress={() => handleVerify()}
+        onPress={() => navigation.navigate('HomeScreen')}
         className="bg-neutral-900 relative   text-white  items-center p-4 rounded-lg"
       >
         <Text style={styles.ButtonText} className="text-white">
-          Confirm
+          Send
         </Text>
       </TouchableOpacity>
       {errorMessage && (
-            <MessageModal
-              message={errorMessage}
-              hideModel={setErrorMessage}
-              visible={true}
-            />
-          )}
+        <MessageModal
+          message={errorMessage}
+          hideModel={setErrorMessage}
+          visible={true}
+        />
+      )}
     </SafeAreaView>
   )
 }
@@ -159,14 +162,14 @@ const styles = StyleSheet.create({
     width: wd((343 / 375) * 100),
   },
   ButtonText: {
-    fontSize: hp(2.3), 
+    fontSize: hp(2.3),
   },
   codeFieldRoot: {
     marginTop: 20,
     marginHorizontal: 10,
   },
-  cell :{
-    width:wd((50/343)*100),
-    height:hp((66/812) *100)
-  }
+  cell: {
+    width: wd((50 / 343) * 100),
+    height: hp((66 / 812) * 100),
+  },
 })
