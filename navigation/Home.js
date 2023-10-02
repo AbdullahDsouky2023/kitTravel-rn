@@ -16,7 +16,8 @@ export default function HomeNavigation() {
       screenOptions={{
         headerBackgroundContainerStyle: "red",
         tabBarStyle:{
-            // backgroundColor:'red',
+            position:'absolute',
+            bottom:0,
             margin:16,
             borderRadius:8,
             paddingTop:15,

@@ -10,7 +10,7 @@ export default function TabIcon({focused,iconName,tabName}) {
   return (
     <View 
               style={{
-                width:widthPercentageToDP((86/343)*100),
+                width:widthPercentageToDP((86/375)*100),
                 display:'flex',
                 alignItems:'center'
               }}
